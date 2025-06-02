@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState, useEffect } from "react"
 import animeData, { getAnimeTitle } from "../anime-data"
 import { domToBlob } from "modern-screenshot"
 import { toast } from "sonner"
@@ -15,6 +15,10 @@ export const App = () => {
   )
 
   const wrapper = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    document.title = t('title')
+  }, [language, t])
 
   const imageToBlob = async () => {
     if (!wrapper.current) return
@@ -330,11 +334,11 @@ ${Object.keys(animeData)
           <div className="text-center text-sm text-gray-600">
             English version is translated by{' '}
             <a
-              href="https://spellbrush.com/"
+              href="https://mhh0318.github.io/"
               target="_blank"
               className="underline"
             >
-              Spellbrush
+             h1t
             </a>
           </div>
         )}

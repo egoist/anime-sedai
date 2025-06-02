@@ -36,7 +36,7 @@ export const translations = {
     english: 'English'
   },
   en: {
-    title: 'Anime Generation',
+    title: 'Anime Sedai',
     subtitle: 'Click to select anime you have watched',
     website: 'anime-sedai.egoist.dev',
     watchedCount: 'I have watched {{count}}/{{total}} anime',
