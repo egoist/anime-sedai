@@ -56,7 +56,7 @@ export const translations = {
     promptZako: 'Zako❤',
     copy: 'Copy',
     openInChatWise: 'Open in ChatWise (installation required)',
-    footer: 'Most watched anime by year, data from bgm.tv, made by',
+    footer: 'Most watched anime by year, data from bgm.tv, made by ',
     madeBy: ', ',
     viewCode: 'View Code',
     otherProducts: 'Other products by the author: ',

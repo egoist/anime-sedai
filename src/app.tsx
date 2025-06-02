@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState } from "react"
-import animeData from "../anime-data"
+import animeData, { getAnimeTitle } from "../anime-data"
 import { domToBlob } from "modern-screenshot"
 import { toast } from "sonner"
 import { usePersistState } from "./hooks"
-import { useI18n } from "./useI18n"
+import { useI18n } from "./i18n-context"
 import { LanguageToggle } from "./LanguageToggle"
 import { getPromptTemplate } from "./i18n"
 
@@ -77,12 +77,12 @@ ${Object.keys(animeData)
 
     const sliceItems = items.slice(0, 12)
     const watched = sliceItems
-      .filter((item) => selectedAnime.includes(item.title))
-      .map((item) => item.title)
+      .filter((item) => selectedAnime.includes(getAnimeTitle(item, 'zh')))
+      .map((item) => getAnimeTitle(item, language))
       .join(", ")
     const unWatched = sliceItems
-      .filter((item) => !selectedAnime.includes(item.title))
-      .map((item) => item.title)
+      .filter((item) => !selectedAnime.includes(getAnimeTitle(item, 'zh')))
+      .map((item) => getAnimeTitle(item, language))
       .join(", ")
 
     return [
@@ -99,7 +99,7 @@ ${Object.keys(animeData)
   }, [selectedAnime, promptType, language, t])
 
   const totalAnime = Object.values(animeData).flatMap((year) => {
-    return year.map((item) => item.title).slice(0, 12)
+    return year.map((item) => getAnimeTitle(item, 'zh')).slice(0, 12)
   }).length
 
   return (
@@ -109,59 +109,86 @@ ${Object.keys(animeData)
           <div className="flex justify-end mb-4">
             <LanguageToggle />
           </div>
-          <div
-            className="flex flex-col border border-b-0 bg-white w-fit"
-            ref={wrapper}
-          >
-            <div className="border-b justify-between p-2 text-lg  font-bold flex">
-              <h1>
-                {t('title')}<span className="remove"> - {t('subtitle')}</span>
-                <span className="ml-2 text-zinc-400 font-medium">
-                  {t('website')}
+          <div className="w-full overflow-x-auto">
+            <div
+              className="flex flex-col border border-b-0 bg-white w-fit mx-auto"
+              ref={wrapper}
+            >
+              <div className="border-b justify-between p-2 text-lg  font-bold flex">
+                <h1>
+                  {t('title')}<span className="remove"> - {t('subtitle')}</span>
+                  <span className="ml-2 text-zinc-400 font-medium">
+                    {t('website')}
+                  </span>
+                </h1>
+                <span className="shrink-0 whitespace-nowrap">
+                  {t('watchedCount', { count: selectedAnime.length, total: totalAnime })}
                 </span>
-              </h1>
-              <span className="shrink-0 whitespace-nowrap">
-                {t('watchedCount', { count: selectedAnime.length, total: totalAnime })}
-              </span>
+              </div>
+              {Object.keys(animeData).map((year) => {
+                const items = animeData[year] || []
+                return (
+                  <div key={year} className="flex border-b">
+                    <div className={`
+                      bg-red-500 shrink-0 text-white flex items-center font-bold justify-center p-1 border-black
+                      h-16 md:h-20 
+                      ${language === 'en' ? 'w-16 md:w-20' : 'w-16 md:w-20'}
+                    `}>
+                      <span className={`${language === 'en' ? 'text-sm md:text-base' : 'text-base'} text-center`}>
+                        {year}
+                      </span>
+                    </div>
+                    <div className="flex shrink-0">
+                      {items.slice(0, 12).map((item) => {
+                        const animeKey = getAnimeTitle(item, 'zh')
+                        const displayTitle = getAnimeTitle(item, language)
+                        const isSelected = selectedAnime.includes(animeKey)
+                        return (
+                          <button
+                            key={animeKey}
+                            className={`
+                              h-16 md:h-20 
+                              ${language === 'en' ? 'w-20 md:w-24' : 'w-16 md:w-20'}
+                              border-l break-all text-center shrink-0 inline-flex items-center 
+                              p-1 overflow-hidden justify-center cursor-pointer 
+                              ${language === 'en' ? 'text-xs' : 'text-sm'} 
+                              ${isSelected ? "bg-green-500" : "hover:bg-zinc-100"}
+                              transition-colors duration-200
+                            `}
+                            title={displayTitle}
+                            onClick={() => {
+                              setSelectedAnime((prev) => {
+                                if (isSelected) {
+                                  return prev.filter(
+                                    (title) => title !== animeKey
+                                  )
+                                }
+                                return [...prev, animeKey]
+                              })
+                            }}
+                          >
+                            <span className={`leading-tight w-full ${language === 'en' ? 'line-clamp-4' : 'line-clamp-3'}`}>
+                              {displayTitle}
+                            </span>
+                          </button>
+                        )
+                      })}
+                      {Array.from({ length: Math.max(0, 12 - items.length) }, (_, index) => (
+                        <div
+                          key={`empty-${index}`}
+                          className={`
+                            h-16 md:h-20 
+                            ${language === 'en' ? 'w-20 md:w-24' : 'w-16 md:w-20'}
+                            border-l bg-gray-50
+                          `}
+                        />
+                      ))}
+                      <div className="w-0 h-16 md:h-20 border-r" />
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-            {Object.keys(animeData).map((year) => {
-              const items = animeData[year] || []
-              return (
-                <div key={year} className="flex border-b">
-                  <div className="bg-red-500 shrink-0 text-white flex items-center font-bold justify-center p-1 size-16 md:size-20 border-black">
-                    {year}
-                  </div>
-                  <div className="flex shrink-0">
-                    {items.slice(0, 12).map((item) => {
-                      const isSelected = selectedAnime.includes(item.title)
-                      return (
-                        <button
-                          key={item.title}
-                          className={`size-16 md:size-20 border-l break-all text-center shrink-0 inline-flex items-center p-1 overflow-hidden justify-center cursor-pointer text-sm  ${
-                            isSelected ? "bg-green-500" : "hover:bg-zinc-100"
-                          }`}
-                          title={item.title}
-                          onClick={() => {
-                            setSelectedAnime((prev) => {
-                              if (isSelected) {
-                                return prev.filter(
-                                  (title) => title !== item.title
-                                )
-                              }
-                              return [...prev, item.title]
-                            })
-                          }}
-                        >
-                          <span className="leading-tight w-full line-clamp-3">
-                            {item.title}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
           </div>
         </div>
 
@@ -172,7 +199,7 @@ ${Object.keys(animeData)
             onClick={() => {
               setSelectedAnime(
                 Object.values(animeData).flatMap((year) => {
-                  return year.map((item) => item.title).slice(0, 12)
+                  return year.map((item) => getAnimeTitle(item, 'zh')).slice(0, 12)
                 })
               )
             }}
@@ -283,11 +310,11 @@ ${Object.keys(animeData)
         <div className="mt-2 text-center">
           {t('footer')}
           <a
-            href="https://x.com/localhost_4173"
+            href={language === 'zh' ? "https://x.com/localhost_4173" : "https://x.com/localhost_5173"}
             target="_blank"
             className="underline"
           >
-            {language === 'zh' ? '低空飞行' : 'localhost_4173'}
+            {language === 'zh' ? '低空飞行' : 'egoist'}
           </a>
           {t('madeBy')}
           <a
@@ -298,6 +325,19 @@ ${Object.keys(animeData)
             {t('viewCode')}
           </a>
         </div>
+
+        {language === 'en' && (
+          <div className="text-center text-sm text-gray-600">
+            English version is translated by{' '}
+            <a
+              href="https://spellbrush.com/"
+              target="_blank"
+              className="underline"
+            >
+              Spellbrush
+            </a>
+          </div>
+        )}
 
         <div className="text-center">
           {t('otherProducts')}
