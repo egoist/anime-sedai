@@ -7,7 +7,7 @@ const data: Data = {
     { title: "死亡笔记", score: 8.4 },
     { title: "银魂", score: 8.7 },
     { title: "Code Geass 反叛的鲁路修", score: 8.3 },
-    { title: "彩云国物语", score: 6.8 },
+    { title: "魔法老师涅吉!? ", score: 6.6 },
     { title: "Fate/stay night", score: 7.1 },
     { title: "凉宫春日的忧郁", score: 8.2 },
     { title: "奇幻贵公子", score: 7.1 },
