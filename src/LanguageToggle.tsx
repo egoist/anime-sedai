@@ -1,31 +1,41 @@
-import { useI18n } from './i18n-context'
+import { useI18n } from "./i18n-context"
 
 export const LanguageToggle = () => {
   const { language, setLanguage, t } = useI18n()
-  
+
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-600">{t('language')}:</span>
+      <span className="text-sm text-gray-600">{t("language")}:</span>
       <button
         className={`px-3 py-1 text-sm rounded transition-colors ${
-          language === 'zh' 
-            ? 'bg-blue-500 text-white' 
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          language === "zh"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
         }`}
-        onClick={() => setLanguage('zh')}
+        onClick={() => setLanguage("zh")}
       >
-        {t('chinese')}
+        {t("chinese")}
       </button>
       <button
         className={`px-3 py-1 text-sm rounded transition-colors ${
-          language === 'en' 
-            ? 'bg-blue-500 text-white' 
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          language === "en"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
         }`}
-        onClick={() => setLanguage('en')}
+        onClick={() => setLanguage("en")}
       >
-        {t('english')}
+        {t("english")}
+      </button>
+      <button
+        className={`px-3 py-1 text-sm rounded transition-colors ${
+          language === "ja"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
+        onClick={() => setLanguage("ja")}
+      >
+        {t("japanese")}
       </button>
     </div>
   )
-} 
+}
