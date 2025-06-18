@@ -230,7 +230,7 @@ const data: Data = {
       titleEn: "The Pet Girl of Sakurasou",
       score: 7.4,
     },
-    { titleZh: "心理测量者", titleEn: "Psychi-Pass", score: 7.9 },
+    { titleZh: "心理测量者", titleEn: "Psycho-Pass", score: 7.9 },
     { titleZh: "恶魔高校 D×D", titleEn: "High School DxD", score: 6.9 },
     { titleZh: "刀剑神域", titleEn: "Sword Art Online", score: 7.3 },
     { titleZh: "人类衰退之后", titleEn: "Humanity Has Declined", score: 7.9 },
