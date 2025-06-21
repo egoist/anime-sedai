@@ -1260,7 +1260,7 @@ const data: Data = {
     },
     {
       titleZh: "少女☆歌剧 Revue Starlight",
-      titleEn: "Shōjo☆gekijō Revue Starlight",
+      titleEn: "Shoujo☆Kageki Revue Starlight",
       titleJa: "少女☆歌劇 レヴュースタァライト",
       score: 7.9,
     },
