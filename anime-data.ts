@@ -1849,7 +1849,7 @@ const data: Data = {
     },
     {
       titleZh: "失忆投捕",
-      titleEn: "The Elusive Samurai",
+      titleEn: "Oblivion Battery",
       titleJa: "忘却バッテリー",
       score: 7.9,
     },
@@ -1862,7 +1862,7 @@ const data: Data = {
     {
       titleZh: "悲喜渔生",
       titleEn: "Fisherman's Songs",
-      titleJa: "悲喜漁生",
+      titleJa: "ネガポジアングラー",
       score: 7.3,
     },
     {
@@ -1873,8 +1873,8 @@ const data: Data = {
     },
     {
       titleZh: "缘结甘神家",
-      titleEn: "The Elusive Samurai",
-      titleJa: "結婚甘神家",
+      titleEn: "Tying the Knot with an Amagami Sister",
+      titleJa: "甘神さんちの縁結び",
       score: 5.9,
     },
   ],
