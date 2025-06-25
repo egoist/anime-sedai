@@ -703,7 +703,7 @@ const data: Data = {
     },
     {
       titleZh: "我的青春恋爱物语果然有问题",
-      titleEn: "My Teen Romantic Comedy SNAF",
+      titleEn: "My Teen Romantic Comedy SNAFU",
       titleJa: "やはり俺の青春ラブコメはまちがっている。",
       score: 7.5,
     },
