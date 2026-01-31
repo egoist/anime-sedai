@@ -1878,6 +1878,80 @@ const data: Data = {
       score: 5.9,
     },
   ],
+    "2025": [
+    {
+      titleZh: "金牌得主",
+      titleEn: "Medalist",
+      titleJa: "メダリスト",
+      score: 8.3,
+    },
+    {
+      titleZh: "末日后酒店",
+      titleEn: "Apocalypse Hotel",
+      titleJa: "アポカリプスホテル",
+      score: 8.1,
+    },
+    {
+      titleZh: "小城日常",
+      titleEn: "CITY THE ANIMATION",
+      titleJa: "CITY THE ANIMATION",
+      score: 8.0,
+    },
+    {
+      titleZh: "夏日口袋",
+      titleEn: "Summer Pockets",
+      titleJa: "Summer Pockets",
+      score: 7.6,
+    },
+    {
+      titleZh: "时光流逝，饭菜依旧美味",
+      titleEn: "Days Go By, Food Is Still Delicious",
+      titleJa: "日々は過ぎれど飯うまし",
+      score: 7.5,
+    },
+    {
+      titleZh: "mono",
+      titleEn: "mono",
+      titleJa: "mono",
+      score: 7.4,
+    },
+    {
+      titleZh: "赛马娘 灰发灰姑娘",
+      titleEn: "Uma Musume: Cinderella Gray",
+      titleJa: "ウマ娘 シンデレラグレイ",
+      score: 7.3,
+    },
+    {
+      titleZh: "BanG Dream! Ave Mujica",
+      titleEn: "BanG Dream! Ave Mujica",
+      titleJa: "BanG Dream! Ave Mujica",
+      score: 7.6,
+    },
+    {
+      titleZh: "我怎么可能成为你的恋人，不行不行？",
+      titleEn: "There's No Way I Can Be Your Lover",
+      titleJa: "わたしが恋人になれるわけないじゃん、ムリムリ？",
+      score: 7.2,
+    },
+    {
+      titleZh: "薰香花朵凛然绽放",
+      titleEn: "The Fragrant Flower Blooms With Dignity",
+      titleJa: "薫る花は凛と咲く",
+      score: 7.4,
+    },
+    {
+      titleZh: "高达 GQuuuuuuX",
+      titleEn: "Mobile Suit Gundam GQuuuuuuX",
+      titleJa: "機動戦士ガンダム GQuuuuuuX",
+      score: 7.1,
+    },
+    {
+      titleZh: "你与偶像 光之美少女",
+      titleEn: "You and Idol Pretty Cure♪",
+      titleJa: "キミとアイドルプリキュア♪",
+      score: 7.0,
+    },
+  ],
 }
 
 // 添加一个辅助函数来根据语言获取动画标题
