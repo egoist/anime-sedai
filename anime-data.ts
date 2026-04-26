@@ -322,6 +322,12 @@ const data: Data = {
       titleJa: "君に届け",
       score: 7.6,
     },
+    {
+      titleZh: "东之伊甸",
+      titleEn: "Eden of the East",
+      titleJa: "東のエデン",
+      score: 7.5,
+    },
   ],
   "2010": [
     {
