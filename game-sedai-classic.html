@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>游戏世代 经典版</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #f4f4f5;
+    color: #18181b;
+    padding: 16px 8px 40px;
+  }
+  .page { max-width: 1280px; margin: 0 auto; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .toolbar label { font-size: 14px; color: #52525b; }
+  .toolbar select {
+    border: 1px solid #d4d4d8; border-radius: 6px;
+    padding: 4px 8px; font-size: 14px; background: #fff;
+  }
+  .lang-toggle { display: inline-flex; border: 1px solid #d4d4d8; border-radius: 6px; overflow: hidden; }
+  .lang-toggle button {
+    border: none; background: #fff; padding: 4px 10px; font-size: 13px;
+    cursor: pointer; color: #52525b;
+  }
+  .lang-toggle button.active { background: #18181b; color: #fff; }
+  .scroll-x { width: 100%; overflow-x: auto; }
+  .table-card {
+    display: flex; flex-direction: column;
+    border: 1px solid #d4d4d8; border-bottom: none;
+    background: #fff; width: fit-content; margin: 0 auto;
+  }
+  .head-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px; font-size: 18px; font-weight: 700; border-bottom: 1px solid #d4d4d8;
+  }
+  .head-row h1 { font-size: 18px; font-weight: 700; white-space: nowrap; }
+  .head-row .sub { color: #a1a1aa; font-weight: 400; }
+  .head-row .site { margin-left: 8px; color: #a1a1aa; font-weight: 500; font-size: 14px; white-space: nowrap; }
+  .head-row .count { flex-shrink: 0; white-space: nowrap; font-size: 16px; }
+  .year-row { display: flex; border-bottom: 1px solid #d4d4d8; }
+  .year-col {
+    background: #ef4444; color: #fff; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; padding: 4px;
+    width: 64px; height: 64px;
+  }
+  @media (min-width: 768px) { .year-col { width: 80px; height: 80px; } }
+  .year-col span { text-align: center; font-size: 16px; }
+  .cell-row { display: flex; flex-shrink: 0; }
+  .game-btn {
+    height: 64px; width: 64px;
+    border: none; border-left: 1px solid #d4d4d8;
+    word-break: break-word; text-align: center;
+    flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    padding: 4px; overflow: hidden; cursor: pointer;
+    font-size: 14px; font-family: inherit; color: #18181b;
+    background: #fff;
+    transition: background-color .2s;
+  }
+  .game-btn.en { width: 80px; font-size: 12px; }
+  .game-btn.ja { width: 72px; font-size: 13px; }
+  .game-btn:hover { background: #f4f4f5; }
+  .game-btn.selected { background: #22c55e; color: #fff; }
+  .game-btn.selected:hover { background: #22c55e; }
+  .game-btn span { line-height: 1.3; width: 100%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .game-btn.en span { -webkit-line-clamp: 4; }
+  .game-btn.ja span { -webkit-line-clamp: 3; }
+  .empty-cell { height: 64px; width: 64px; border-left: 1px solid #d4d4d8; background: #f9fafb; }
+  .empty-cell.en { width: 80px; }
+  .empty-cell.ja { width: 72px; }
+  @media (min-width: 768px) {
+    .game-btn, .empty-cell { height: 80px; width: 80px; }
+    .game-btn.en, .empty-cell.en { width: 96px; }
+    .game-btn.ja, .empty-cell.ja { width: 88px; }
+  }
+  .row-end { width: 0; height: 64px; border-right: 1px solid #d4d4d8; }
+  @media (min-width: 768px) { .row-end { height: 80px; } }
+  .action-bar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+  .btn {
+    border: 1px solid #d4d4d8; border-radius: 6px; padding: 8px 16px;
+    background: #fff; cursor: pointer; font-size: 14px; color: #18181b;
+  }
+  .btn:hover { background: #f4f4f5; }
+  .prompt-box {
+    border: 1px solid #d4d4d8; border-radius: 6px;
+    max-width: 768px; width: 100%; margin: 16px auto 0;
+    background: #fff;
+  }
+  .prompt-box:focus-within { border-color: #ec4899; box-shadow: 0 0 0 2px rgba(236,72,153,.5); }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px; border-bottom: 1px solid #d4d4d8;
+  }
+  .prompt-head .left { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .prompt-head select { border: 1px solid #d4d4d8; border-radius: 6px; padding: 2px 6px; font-size: 13px; background: #fff; }
+  .prompt-head .right { display: flex; align-items: center; gap: 16px; }
+  .prompt-head .mini {
+    font-size: 13px; color: #71717a; background: none; border: none;
+    cursor: pointer; padding: 2px 6px; border-radius: 6px;
+  }
+  .prompt-head .mini:hover { background: #f4f4f5; }
+  .prompt-box textarea {
+    outline: none; width: 100%; padding: 8px; resize: none;
+    border: none; font-size: 14px; line-height: 1.5; cursor: default;
+    background: #fff; font-family: inherit;
+  }
+  .footer { margin-top: 16px; text-align: center; font-size: 14px; color: #52525b; }
+  .footer a { color: #2563eb; text-decoration: underline; }
+  .nav-links { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+  .nav-link {
+    border: 1px solid #d4d4d8; border-radius: 6px; padding: 4px 10px;
+    font-size: 13px; color: #18181b; background: #fff; text-decoration: none;
+    transition: background-color .2s;
+  }
+  .nav-link:hover { background: #f4f4f5; }
+  .nav-link.on { background: #18181b; color: #fff; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="toolbar">
+    <label><span data-i18n="yearRange">年份范围</span>:
+      <select id="yearRangeSelect">
+        <option value="5" data-i18n="last5Years">近 5 年</option>
+        <option value="10" data-i18n="last10Years">近 10 年</option>
+        <option value="15" data-i18n="last15Years">近 15 年</option>
+        <option value="all" data-i18n="allYears">全部</option>
+      </select>
+    </label>
+    <span class="lang-toggle" id="langToggle"></span>
+    <span class="nav-links">
+      <a class="nav-link" href="game-sedai.html">新世代版</a>
+      <a class="nav-link on" href="game-sedai-classic.html">经典版</a>
+      <a class="nav-link" href="https://anime-sedai.egoist.dev" target="_blank" rel="noopener">动画版（原版）</a>
+    </span>
+  </div>
+
+  <div class="scroll-x">
+    <div class="table-card" id="tableCard">
+      <div class="head-row">
+        <h1><span id="titleText">游戏世代</span><span class="sub" id="subtitleText"> - 点击选择你玩过的游戏</span><span class="site" id="siteText">game-sedai.egoist.dev</span></h1>
+        <span class="count" id="countText">我玩过 0/240 款游戏</span>
+      </div>
+      <div id="tableBody"></div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn" id="selectAllBtn">全选</button>
+    <button class="btn" id="clearBtn" style="display:none">清除</button>
+    <button class="btn" id="copyImageBtn">复制图片</button>
+    <button class="btn" id="downloadImageBtn">下载图片</button>
+  </div>
+
+  <div class="prompt-box">
+    <div class="prompt-head">
+      <div class="left">
+        <span data-i18n="promptType">锐评提示词</span>
+        <select id="promptTypeSelect">
+          <option value="normal" data-i18n="promptNormal">普通</option>
+          <option value="zako" data-i18n="promptZako">杂鱼❤</option>
+        </select>
+      </div>
+      <div class="right">
+        <button class="mini" id="copyPromptBtn">复制</button>
+        <button class="mini" id="chatgptBtn">在 ChatGPT 中打开</button>
+      </div>
+    </div>
+    <textarea id="promptText" rows="10" readonly></textarea>
+  </div>
+
+  <div class="footer" id="footerText"></div>
+</div>
+
+<script>
+"use strict";
+
+/* ===================== 游戏数据 data[year] = [{titleZh,titleEn,titleJa,score}] ===================== */
+const gameData = {
+  "1983": [
+    { titleZh: "大金刚", titleEn: "Donkey Kong", titleJa: "ドンキーコング", score: 8.5 },
+    { titleZh: "马里奥兄弟", titleEn: "Mario Bros.", titleJa: "マリオブラザーズ", score: 8.3 },
+    { titleZh: "大金刚Jr", titleEn: "Donkey Kong Jr.", titleJa: "ドンキーコングJR.", score: 8.0 },
+    { titleZh: "大力水手", titleEn: "Popeye", titleJa: "ポパイ", score: 7.5 },
+    { titleZh: "棒球", titleEn: "Baseball", titleJa: "ベースボール", score: 7.2 },
+    { titleZh: "麻将", titleEn: "Mahjong", titleJa: "麻雀", score: 7.0 },
+    { titleZh: "围棋", titleEn: "Go", titleJa: "囲碁", score: 7.0 },
+    { titleZh: "龙穴", titleEn: "Dragon's Lair", titleJa: "ドラゴンズレア", score: 7.6 },
+    { titleZh: "星球大战", titleEn: "Star Wars", titleJa: "スター・ウォーズ", score: 7.8 },
+    { titleZh: "大金刚3", titleEn: "Donkey Kong 3", titleJa: "ドンキーコング3", score: 7.4 },
+    { titleZh: "间谍猎手", titleEn: "Spy Hunter", titleJa: "スパイハンター", score: 7.3 },
+    { titleZh: "田径", titleEn: "Track & Field", titleJa: "ハイパースポーツ", score: 7.6 },
+  ],
+  "1984": [
+    { titleZh: "铁板阵", titleEn: "Xevious", titleJa: "ゼビウス", score: 8.1 },
+    { titleZh: "气球大战", titleEn: "Balloon Fight", titleJa: "バルーンファイト", score: 7.9 },
+    { titleZh: "越野机车", titleEn: "Excitebike", titleJa: "エキサイトバイク", score: 8.0 },
+    { titleZh: "淘金者", titleEn: "Lode Runner", titleJa: "ロードランナー", score: 8.0 },
+    { titleZh: "拳无虚发", titleEn: "Punch-Out!!", titleJa: "パンチアウト!!", score: 7.9 },
+    { titleZh: "功夫", titleEn: "Kung-Fu Master", titleJa: "スパルタンX", score: 7.8 },
+    { titleZh: "网球", titleEn: "Tennis", titleJa: "テニス", score: 7.3 },
+    { titleZh: "高尔夫", titleEn: "Golf", titleJa: "ゴルフ", score: 7.2 },
+    { titleZh: "公路16", titleEn: "Road Fighter", titleJa: "ロードファイター", score: 7.4 },
+    { titleZh: "F1赛车", titleEn: "F1 Race", titleJa: "F1レース", score: 7.3 },
+    { titleZh: "恶魔世界", titleEn: "Devil World", titleJa: "デビルワールド", score: 7.5 },
+    { titleZh: "弹球", titleEn: "Pinball", titleJa: "ピンボール", score: 7.0 },
+  ],
+  "1985": [
+    { titleZh: "超级马里奥兄弟", titleEn: "Super Mario Bros.", titleJa: "スーパーマリオブラザーズ", score: 9.4 },
+    { titleZh: "坦克大战", titleEn: "Battle City", titleJa: "バトルシティー", score: 8.2 },
+    { titleZh: "宇宙巡航机", titleEn: "Gradius", titleJa: "グラディウス", score: 8.3 },
+    { titleZh: "俄罗斯方块", titleEn: "Tetris", titleJa: "テトリス", score: 8.8 },
+    { titleZh: "兵蜂", titleEn: "TwinBee", titleJa: "ツインビー", score: 8.0 },
+    { titleZh: "太空哈利", titleEn: "Space Harrier", titleJa: "スペースハリアー", score: 8.0 },
+    { titleZh: "幽暗秘境", titleEn: "Gauntlet", titleJa: "ガントレット", score: 7.8 },
+    { titleZh: "影子传说", titleEn: "The Legend of Kage", titleJa: "影の伝説", score: 7.8 },
+    { titleZh: "长途越野机车", titleEn: "Hang-On", titleJa: "ハングオン", score: 7.7 },
+    { titleZh: "冰山攀爬者", titleEn: "Ice Climber", titleJa: "アイスクライマー", score: 7.6 },
+    { titleZh: "足球", titleEn: "Soccer", titleJa: "サッカー", score: 7.2 },
+    { titleZh: "国王密使2", titleEn: "King's Quest II", titleJa: "キングスクエストII", score: 7.9 },
+  ],
+  "1986": [
+    { titleZh: "塞尔达传说", titleEn: "The Legend of Zelda", titleJa: "ゼルダの伝説", score: 9.0 },
+    { titleZh: "勇者斗恶龙", titleEn: "Dragon Quest", titleJa: "ドラゴンクエスト", score: 8.8 },
+    { titleZh: "银河战士", titleEn: "Metroid", titleJa: "メトロイド", score: 8.4 },
+    { titleZh: "恶魔城", titleEn: "Castlevania", titleJa: "悪魔城ドラキュラ", score: 8.2 },
+    { titleZh: "超级马里奥兄弟2（日版）", titleEn: "Super Mario Bros. 2 (Japan)", titleJa: "スーパーマリオブラザーズ2", score: 8.0 },
+    { titleZh: "魔界村", titleEn: "Ghosts 'n Goblins", titleJa: "魔界村", score: 7.9 },
+    { titleZh: "泡泡龙", titleEn: "Bubble Bobble", titleJa: "バブルボブル", score: 7.8 },
+    { titleZh: "冒险岛", titleEn: "Adventure Island", titleJa: "高橋名人の冒険島", score: 7.6 },
+    { titleZh: "沙罗曼蛇", titleEn: "Salamander", titleJa: "沙羅曼蛇", score: 7.7 },
+    { titleZh: "大盗五右卫门", titleEn: "Ganbare Goemon! Karakuri Dōchū", titleJa: "がんばれゴエモン！からくり道中", score: 7.6 },
+    { titleZh: "迷宫组曲", titleEn: "Meikyū Kumikyoku", titleJa: "迷宮組曲", score: 7.5 },
+    { titleZh: "火之鸟 凤凰篇", titleEn: "Hinotori: The Firebird", titleJa: "火の鳥 鳳凰編", score: 7.6 },
+  ],
+  "1987": [
+    { titleZh: "最终幻想", titleEn: "Final Fantasy", titleJa: "ファイナルファンタジー", score: 8.7 },
+    { titleZh: "勇者斗恶龙2", titleEn: "Dragon Quest II", titleJa: "ドラゴンクエストII", score: 8.5 },
+    { titleZh: "塞尔达传说2", titleEn: "Zelda II: The Adventure of Link", titleJa: "リンクの冒険", score: 8.3 },
+    { titleZh: "洛克人", titleEn: "Mega Man", titleJa: "ロックマン", score: 8.2 },
+    { titleZh: "合金装备", titleEn: "Metal Gear", titleJa: "メタルギア", score: 8.6 },
+    { titleZh: "街头霸王", titleEn: "Street Fighter", titleJa: "ストリートファイター", score: 8.0 },
+    { titleZh: "双截龙", titleEn: "Double Dragon", titleJa: "ダブルドラゴン", score: 8.1 },
+    { titleZh: "冲破火网", titleEn: "After Burner", titleJa: "アフターバーナー", score: 7.8 },
+    { titleZh: "恶魔城2", titleEn: "Castlevania II: Simon's Quest", titleJa: "ドラキュラII 呪いの封印", score: 7.9 },
+    { titleZh: "绿色兵团", titleEn: "Rush'n Attack", titleJa: "グリーンベレー", score: 7.6 },
+    { titleZh: "热血硬派", titleEn: "Renegade", titleJa: "熱血硬派くにおくん", score: 7.7 },
+    { titleZh: "信长之野望 全国版", titleEn: "Nobunaga's Ambition", titleJa: "信長の野望 全国版", score: 8.0 },
+  ],
+  "1988": [
+    { titleZh: "超级马里奥兄弟3", titleEn: "Super Mario Bros. 3", titleJa: "スーパーマリオブラザーズ3", score: 9.2 },
+    { titleZh: "勇者斗恶龙3", titleEn: "Dragon Quest III", titleJa: "ドラゴンクエストIII", score: 8.9 },
+    { titleZh: "魂斗罗", titleEn: "Contra", titleJa: "魂斗羅", score: 8.4 },
+    { titleZh: "洛克人2", titleEn: "Mega Man 2", titleJa: "ロックマン2", score: 8.5 },
+    { titleZh: "忍者龙剑传", titleEn: "Ninja Gaiden", titleJa: "忍者龍剣伝", score: 8.3 },
+    { titleZh: "双截龙2", titleEn: "Double Dragon II", titleJa: "ダブルドラゴンII", score: 8.0 },
+    { titleZh: "赤色要塞", titleEn: "Jackal", titleJa: "赤色要塞", score: 7.9 },
+    { titleZh: "R型战机", titleEn: "R-Type", titleJa: "R-TYPE", score: 8.1 },
+    { titleZh: "俄罗斯方块", titleEn: "Tetris", titleJa: "テトリス", score: 8.6 },
+    { titleZh: "宇宙巡航机2", titleEn: "Gradius II", titleJa: "グラディウスII", score: 8.0 },
+    { titleZh: "热血高校躲避球部", titleEn: "Downtown Nekketsu Dodgeball", titleJa: "熱血高校ドッジボール部", score: 7.7 },
+    { titleZh: "超级马里奥兄弟USA", titleEn: "Super Mario Bros. 2 (USA)", titleJa: "スーパーマリオブラザーズUSA", score: 7.8 },
+  ],
+  "1989": [
+    { titleZh: "超级魂斗罗", titleEn: "Super C", titleJa: "スーパー魂斗羅", score: 8.2 },
+    { titleZh: "恶魔城传说", titleEn: "Castlevania III: Dracula's Curse", titleJa: "悪魔城伝説", score: 8.3 },
+    { titleZh: "忍者神龟", titleEn: "Teenage Mutant Ninja Turtles", titleJa: "激亀忍者伝", score: 7.9 },
+    { titleZh: "快打旋风", titleEn: "Final Fight", titleJa: "ファイナルファイト", score: 8.2 },
+    { titleZh: "模拟城市", titleEn: "SimCity", titleJa: "シムシティ", score: 8.5 },
+    { titleZh: "波斯王子", titleEn: "Prince of Persia", titleJa: "プリンス・オブ・ペルシャ", score: 8.4 },
+    { titleZh: "唐老鸭梦冒险", titleEn: "DuckTales", titleJa: "ダックテイルズ", score: 7.8 },
+    { titleZh: "三国志", titleEn: "Romance of the Three Kingdoms", titleJa: "三國志", score: 8.0 },
+    { titleZh: "宇宙巡航机3", titleEn: "Gradius III", titleJa: "グラディウスIII", score: 8.1 },
+    { titleZh: "超级马里奥大陆", titleEn: "Super Mario Land", titleJa: "スーパーマリオランド", score: 8.3 },
+    { titleZh: "俄罗斯方块（Game Boy）", titleEn: "Tetris (Game Boy)", titleJa: "テトリス", score: 8.4 },
+    { titleZh: "吞食天地", titleEn: "Destiny of an Emperor", titleJa: "天地を喰らう", score: 7.7 },
+  ],
+  "1990": [
+    { titleZh: "勇者斗恶龙4", titleEn: "Dragon Quest IV", titleJa: "ドラゴンクエストIV", score: 8.8 },
+    { titleZh: "最终幻想3", titleEn: "Final Fantasy III", titleJa: "ファイナルファンタジーIII", score: 8.7 },
+    { titleZh: "火焰之纹章", titleEn: "Fire Emblem: Shadow Dragon & the Blade of Light", titleJa: "ファイアーエムブレム 暗黒竜と光の剣", score: 8.6 },
+    { titleZh: "超级马里奥世界", titleEn: "Super Mario World", titleJa: "スーパーマリオワールド", score: 9.0 },
+    { titleZh: "洛克人3", titleEn: "Mega Man 3", titleJa: "ロックマン3", score: 8.4 },
+    { titleZh: "松鼠大战", titleEn: "Chip 'n Dale Rescue Rangers", titleJa: "チップとデールの大作戦", score: 7.9 },
+    { titleZh: "忍者龙剑传2", titleEn: "Ninja Gaiden II: The Dark Sword of Chaos", titleJa: "忍者龍剣伝II 暗黒の邪神剣", score: 8.2 },
+    { titleZh: "雷电", titleEn: "Raiden", titleJa: "雷電", score: 8.0 },
+    { titleZh: "大航海时代", titleEn: "Uncharted Waters", titleJa: "大航海時代", score: 8.3 },
+    { titleZh: "三国志2", titleEn: "Romance of the Three Kingdoms II", titleJa: "三國志II", score: 8.0 },
+    { titleZh: "热血行进曲", titleEn: "Downtown Nekketsu Kōshinkyoku", titleJa: "ダウンタウン熱血行進曲", score: 7.8 },
+    { titleZh: "马里奥医生", titleEn: "Dr. Mario", titleJa: "ドクターマリオ", score: 7.7 },
+  ],
+  "1991": [
+    { titleZh: "街头霸王2", titleEn: "Street Fighter II: The World Warrior", titleJa: "ストリートファイターII", score: 9.0 },
+    { titleZh: "塞尔达传说：众神的三角力量", titleEn: "The Legend of Zelda: A Link to the Past", titleJa: "ゼルダの伝説 神々のトライフォース", score: 9.1 },
+    { titleZh: "最终幻想4", titleEn: "Final Fantasy IV", titleJa: "ファイナルファンタジーIV", score: 8.7 },
+    { titleZh: "索尼克", titleEn: "Sonic the Hedgehog", titleJa: "ソニック・ザ・ヘッジホッグ", score: 8.5 },
+    { titleZh: "怒之铁拳", titleEn: "Streets of Rage", titleJa: "ベア・ナックル", score: 8.3 },
+    { titleZh: "忍者蛙", titleEn: "Battletoads", titleJa: "バトルトード", score: 8.0 },
+    { titleZh: "恶魔城4", titleEn: "Castlevania IV", titleJa: "悪魔城ドラキュラ", score: 8.2 },
+    { titleZh: "饿狼传说", titleEn: "Fatal Fury", titleJa: "餓狼伝説", score: 7.9 },
+    { titleZh: "文明", titleEn: "Sid Meier's Civilization", titleJa: "シヴィライゼーション", score: 8.8 },
+    { titleZh: "噗哟噗哟", titleEn: "Puyo Puyo", titleJa: "ぷよぷよ", score: 7.8 },
+    { titleZh: "洛克人4", titleEn: "Mega Man 4", titleJa: "ロックマン4", score: 8.3 },
+    { titleZh: "忍者龙剑传3", titleEn: "Ninja Gaiden III: The Ancient Ship of Doom", titleJa: "忍者龍剣伝III 黄泉の方舟", score: 8.1 },
+  ],
+  "1992": [
+    { titleZh: "勇者斗恶龙5", titleEn: "Dragon Quest V", titleJa: "ドラゴンクエストV", score: 8.9 },
+    { titleZh: "超级马里奥赛车", titleEn: "Super Mario Kart", titleJa: "スーパーマリオカート", score: 8.6 },
+    { titleZh: "真人快打", titleEn: "Mortal Kombat", titleJa: "モータルコンバット", score: 8.2 },
+    { titleZh: "火焰之纹章外传", titleEn: "Fire Emblem Gaiden", titleJa: "ファイアーエムブレム外伝", score: 8.4 },
+    { titleZh: "超级马里奥大陆2", titleEn: "Super Mario Land 2: 6 Golden Coins", titleJa: "スーパーマリオランド2 6つの金貨", score: 8.3 },
+    { titleZh: "索尼克2", titleEn: "Sonic the Hedgehog 2", titleJa: "ソニック・ザ・ヘッジホッグ2", score: 8.4 },
+    { titleZh: "洛克人5", titleEn: "Mega Man 5", titleJa: "ロックマン5", score: 8.2 },
+    { titleZh: "德军总部3D", titleEn: "Wolfenstein 3D", titleJa: "ウルフェンシュタイン3D", score: 8.0 },
+    { titleZh: "沙丘2", titleEn: "Dune II: The Building of a Dynasty", titleJa: "デューンII", score: 8.3 },
+    { titleZh: "饿狼传说2", titleEn: "Fatal Fury 2", titleJa: "餓狼伝説2", score: 7.8 },
+    { titleZh: "光明力量", titleEn: "Shining Force", titleJa: "シャイニング・フォース", score: 8.2 },
+    { titleZh: "三国志3", titleEn: "Romance of the Three Kingdoms III", titleJa: "三國志III", score: 8.0 },
+  ],
+  "1993": [
+    { titleZh: "毁灭战士", titleEn: "Doom", titleJa: "DOOM", score: 8.8 },
+    { titleZh: "神秘岛", titleEn: "Myst", titleJa: "MYST", score: 8.6 },
+    { titleZh: "VR战士", titleEn: "Virtua Fighter", titleJa: "バーチャファイター", score: 8.2 },
+    { titleZh: "真人快打2", titleEn: "Mortal Kombat II", titleJa: "モータルコンバットII", score: 8.3 },
+    { titleZh: "侍魂", titleEn: "Samurai Shodown", titleJa: "サムライスピリッツ", score: 8.1 },
+    { titleZh: "塞尔达传说：梦见岛", titleEn: "The Legend of Zelda: Link's Awakening", titleJa: "ゼルダの伝説 夢をみる島", score: 8.8 },
+    { titleZh: "洛克人X", titleEn: "Mega Man X", titleJa: "ロックマンX", score: 8.4 },
+    { titleZh: "星之卡比 梦之泉物语", titleEn: "Kirby's Adventure", titleJa: "星のカービィ 夢の泉の物語", score: 8.2 },
+    { titleZh: "模拟城市2000", titleEn: "SimCity 2000", titleJa: "シムシティ2000", score: 8.5 },
+    { titleZh: "超级街霸2 Turbo", titleEn: "Super Street Fighter II Turbo", titleJa: "スーパーストリートファイターII X", score: 8.3 },
+    { titleZh: "噗哟噗哟通", titleEn: "Puyo Puyo Tsu", titleJa: "ぷよぷよ通", score: 8.0 },
+    { titleZh: "超级炸弹人", titleEn: "Super Bomberman", titleJa: "スーパーボンバーマン", score: 7.9 },
+  ],
+  "1994": [
+    { titleZh: "最终幻想6", titleEn: "Final Fantasy VI", titleJa: "ファイナルファンタジーVI", score: 9.1 },
+    { titleZh: "超级银河战士", titleEn: "Super Metroid", titleJa: "スーパーメトロイド", score: 9.0 },
+    { titleZh: "超级大金刚", titleEn: "Donkey Kong Country", titleJa: "スーパードンキーコング", score: 8.6 },
+    { titleZh: "铁拳", titleEn: "Tekken", titleJa: "鉄拳", score: 8.2 },
+    { titleZh: "魔兽争霸", titleEn: "Warcraft: Orcs & Humans", titleJa: "ウォークラフト", score: 8.0 },
+    { titleZh: "心跳回忆", titleEn: "Tokimeki Memorial", titleJa: "ときめきメモリアル", score: 8.4 },
+    { titleZh: "地球冒险2", titleEn: "EarthBound (Mother 2)", titleJa: "マザー2 ギーグの逆襲", score: 8.6 },
+    { titleZh: "索尼克3", titleEn: "Sonic the Hedgehog 3", titleJa: "ソニック・ザ・ヘッジホッグ3", score: 8.3 },
+    { titleZh: "洛克人X2", titleEn: "Mega Man X2", titleJa: "ロックマンX2", score: 8.3 },
+    { titleZh: "三国志4", titleEn: "Romance of the Three Kingdoms IV", titleJa: "三國志IV", score: 8.0 },
+    { titleZh: "VR战士2", titleEn: "Virtua Fighter 2", titleJa: "バーチャファイター2", score: 8.2 },
+    { titleZh: "幽游白书 魔强统一战", titleEn: "Yu Yu Hakusho: Makyō Tōitsusen", titleJa: "幽☆遊☆白書 魔強統一戦", score: 8.4 },
+  ],
+  "1995": [
+    { titleZh: "时空之轮", titleEn: "Chrono Trigger", titleJa: "クロノ・トリガー", score: 9.2 },
+    { titleZh: "勇者斗恶龙6", titleEn: "Dragon Quest VI", titleJa: "ドラゴンクエストVI", score: 8.8 },
+    { titleZh: "超级马里奥世界2 耀西岛", titleEn: "Super Mario World 2: Yoshi's Island", titleJa: "スーパーマリオ ヨッシーアイランド", score: 8.8 },
+    { titleZh: "命令与征服", titleEn: "Command & Conquer", titleJa: "コマンド&コンカー", score: 8.4 },
+    { titleZh: "魔兽争霸2", titleEn: "Warcraft II: Tides of Darkness", titleJa: "ウォークラフトII", score: 8.5 },
+    { titleZh: "铁拳2", titleEn: "Tekken 2", titleJa: "鉄拳2", score: 8.3 },
+    { titleZh: "幻想水浒传", titleEn: "Suikoden", titleJa: "幻想水滸伝", score: 8.4 },
+    { titleZh: "洛克人7", titleEn: "Mega Man 7", titleJa: "ロックマン7", score: 8.1 },
+    { titleZh: "街头霸王Alpha", titleEn: "Street Fighter Alpha", titleJa: "ストリートファイターZERO", score: 8.2 },
+    { titleZh: "真人快打3", titleEn: "Mortal Kombat 3", titleJa: "モータルコンバット3", score: 8.0 },
+    { titleZh: "三国志5", titleEn: "Romance of the Three Kingdoms V", titleJa: "三國志V", score: 8.1 },
+    { titleZh: "浪漫沙加3", titleEn: "Romancing SaGa 3", titleJa: "ロマンシング サ・ガ3", score: 8.3 },
+  ],
+  "1996": [
+    { titleZh: "宝可梦 红/绿", titleEn: "Pokémon Red/Green", titleJa: "ポケットモンスター 赤・緑", score: 9.0 },
+    { titleZh: "生化危机", titleEn: "Resident Evil", titleJa: "バイオハザード", score: 8.5 },
+    { titleZh: "超级马里奥64", titleEn: "Super Mario 64", titleJa: "スーパーマリオ64", score: 9.1 },
+    { titleZh: "古墓丽影", titleEn: "Tomb Raider", titleJa: "トゥームレイダー", score: 8.4 },
+    { titleZh: "樱花大战", titleEn: "Sakura Wars", titleJa: "サクラ大戦", score: 8.3 },
+    { titleZh: "命令与征服：红色警戒", titleEn: "Command & Conquer: Red Alert", titleJa: "コマンド&コンカー レッドアラート", score: 8.5 },
+    { titleZh: "雷神之锤", titleEn: "Quake", titleJa: "QUAKE", score: 8.4 },
+    { titleZh: "文明2", titleEn: "Sid Meier's Civilization II", titleJa: "シヴィライゼーションII", score: 8.7 },
+    { titleZh: "马里奥赛车64", titleEn: "Mario Kart 64", titleJa: "マリオカート64", score: 8.4 },
+    { titleZh: "超级马里奥RPG", titleEn: "Super Mario RPG", titleJa: "スーパーマリオRPG", score: 8.6 },
+    { titleZh: "侍魂 天草降临", titleEn: "Samurai Shodown IV: Amakusa's Revenge", titleJa: "サムライスピリッツ 天草降臨", score: 8.0 },
+    { titleZh: "暗黑破坏神", titleEn: "Diablo", titleJa: "ディアブロ", score: 8.4 },
+  ],
+  "1997": [
+    { titleZh: "最终幻想7", titleEn: "Final Fantasy VII", titleJa: "ファイナルファンタジーVII", score: 9.2 },
+    { titleZh: "恶魔城X 月下夜想曲", titleEn: "Castlevania: Symphony of the Night", titleJa: "悪魔城ドラキュラX 月下の夜想曲", score: 9.0 },
+    { titleZh: "铁拳3", titleEn: "Tekken 3", titleJa: "鉄拳3", score: 8.5 },
+    { titleZh: "黄金眼007", titleEn: "GoldenEye 007", titleJa: "ゴールデンアイ 007", score: 8.6 },
+    { titleZh: "古惑狼2", titleEn: "Crash Bandicoot 2: Cortex Strikes Back", titleJa: "クラッシュ・バンディクー2", score: 8.1 },
+    { titleZh: "辐射", titleEn: "Fallout", titleJa: "フォールアウト", score: 8.5 },
+    { titleZh: "GT赛车", titleEn: "Gran Turismo", titleJa: "グランツーリスモ", score: 8.6 },
+    { titleZh: "帝国时代", titleEn: "Age of Empires", titleJa: "エイジ オブ エンパイア", score: 8.4 },
+    { titleZh: "横扫千军", titleEn: "Total Annihilation", titleJa: "トータルアナイアレーション", score: 8.2 },
+    { titleZh: "洛克人X4", titleEn: "Mega Man X4", titleJa: "ロックマンX4", score: 8.3 },
+    { titleZh: "古墓丽影2", titleEn: "Tomb Raider II", titleJa: "トゥームレイダー2", score: 8.1 },
+    { titleZh: "最终幻想战略版", titleEn: "Final Fantasy Tactics", titleJa: "ファイナルファンタジータクティクス", score: 8.7 },
+  ],
+  "1998": [
+    { titleZh: "塞尔达传说：时之笛", titleEn: "The Legend of Zelda: Ocarina of Time", titleJa: "ゼルダの伝説 時のオカリナ", score: 9.4 },
+    { titleZh: "潜龙谍影", titleEn: "Metal Gear Solid", titleJa: "メタルギアソリッド", score: 9.0 },
+    { titleZh: "半条命", titleEn: "Half-Life", titleJa: "ハーフライフ", score: 8.9 },
+    { titleZh: "星际争霸", titleEn: "StarCraft", titleJa: "スタークラフト", score: 8.9 },
+    { titleZh: "生化危机2", titleEn: "Resident Evil 2", titleJa: "バイオハザード2", score: 8.7 },
+    { titleZh: "寄生前夜", titleEn: "Parasite Eve", titleJa: "パラサイト・イヴ", score: 8.2 },
+    { titleZh: "拳皇98", titleEn: "The King of Fighters '98", titleJa: "ザ・キング・オブ・ファイターズ'98", score: 8.4 },
+    { titleZh: "樱花大战2", titleEn: "Sakura Wars 2", titleJa: "サクラ大戦2", score: 8.3 },
+    { titleZh: "博德之门", titleEn: "Baldur's Gate", titleJa: "バルダーズ・ゲート", score: 8.7 },
+    { titleZh: "辐射2", titleEn: "Fallout 2", titleJa: "フォールアウト2", score: 8.6 },
+    { titleZh: "古墓丽影3", titleEn: "Tomb Raider III", titleJa: "トゥームレイダー3", score: 8.0 },
+    { titleZh: "神偷", titleEn: "Thief: The Dark Project", titleJa: "シーフ", score: 8.3 },
+  ],
+  "1999": [
+    { titleZh: "最终幻想8", titleEn: "Final Fantasy VIII", titleJa: "ファイナルファンタジーVIII", score: 8.7 },
+    { titleZh: "宝可梦 金/银", titleEn: "Pokémon Gold/Silver", titleJa: "ポケットモンスター 金・銀", score: 8.8 },
+    { titleZh: "反恐精英", titleEn: "Counter-Strike", titleJa: "カウンターストライク", score: 8.6 },
+    { titleZh: "英雄无敌3", titleEn: "Heroes of Might and Magic III", titleJa: "ヒーローズ オブ マイト アンド マジックIII", score: 8.7 },
+    { titleZh: "帝国时代2", titleEn: "Age of Empires II", titleJa: "エイジ オブ エンパイアII", score: 8.6 },
+    { titleZh: "莎木", titleEn: "Shenmue", titleJa: "シェンムー", score: 8.5 },
+    { titleZh: "生化危机3", titleEn: "Resident Evil 3", titleJa: "バイオハザード3", score: 8.3 },
+    { titleZh: "寂静岭", titleEn: "Silent Hill", titleJa: "サイレントヒル", score: 8.6 },
+    { titleZh: "拳皇99", titleEn: "The King of Fighters '99", titleJa: "ザ・キング・オブ・ファイターズ'99", score: 8.0 },
+    { titleZh: "刀魂", titleEn: "Soulcalibur", titleJa: "ソウルキャリバー", score: 8.5 },
+    { titleZh: "GT赛车2", titleEn: "Gran Turismo 2", titleJa: "グランツーリスモ2", score: 8.4 },
+    { titleZh: "家园", titleEn: "Homeworld", titleJa: "ホームワールド", score: 8.4 },
+  ],
+  "2000": [
+    { titleZh: "暗黑破坏神2", titleEn: "Diablo II", titleJa: "ディアブロII", score: 8.9 },
+    { titleZh: "最终幻想9", titleEn: "Final Fantasy IX", titleJa: "ファイナルファンタジーIX", score: 8.7 },
+    { titleZh: "勇者斗恶龙7", titleEn: "Dragon Quest VII", titleJa: "ドラゴンクエストVII", score: 8.6 },
+    { titleZh: "塞尔达传说：姆吉拉的假面", titleEn: "The Legend of Zelda: Majora's Mask", titleJa: "ゼルダの伝説 ムジュラの仮面", score: 8.7 },
+    { titleZh: "模拟人生", titleEn: "The Sims", titleJa: "シムピープル", score: 8.3 },
+    { titleZh: "梦幻之星Online", titleEn: "Phantasy Star Online", titleJa: "ファンタシースターオンライン", score: 8.3 },
+    { titleZh: "博德之门2", titleEn: "Baldur's Gate II: Shadows of Amn", titleJa: "バルダーズ・ゲートII", score: 8.8 },
+    { titleZh: "完美黑暗", titleEn: "Perfect Dark", titleJa: "パーフェクトダーク", score: 8.4 },
+    { titleZh: "纸片马里奥", titleEn: "Paper Mario", titleJa: "ペーパーマリオ", score: 8.4 },
+    { titleZh: "拳皇2000", titleEn: "The King of Fighters 2000", titleJa: "ザ・キング・オブ・ファイターズ2000", score: 8.0 },
+    { titleZh: "宝可梦 水晶", titleEn: "Pokémon Crystal", titleJa: "ポケットモンスター クリスタル", score: 8.1 },
+    { titleZh: "真三国无双", titleEn: "Dynasty Warriors", titleJa: "真・三國無双", score: 8.0 },
+  ],
+  "2001": [
+    { titleZh: "鬼泣", titleEn: "Devil May Cry", titleJa: "デビルメイクライ", score: 8.6 },
+    { titleZh: "合金装备2", titleEn: "Metal Gear Solid 2: Sons of Liberty", titleJa: "メタルギアソリッド2", score: 8.8 },
+    { titleZh: "GTA3", titleEn: "Grand Theft Auto III", titleJa: "グランド・セフト・オートIII", score: 8.7 },
+    { titleZh: "光环", titleEn: "Halo: Combat Evolved", titleJa: "ヘイロー", score: 8.8 },
+    { titleZh: "最终幻想10", titleEn: "Final Fantasy X", titleJa: "ファイナルファンタジーX", score: 8.7 },
+    { titleZh: "寂静岭2", titleEn: "Silent Hill 2", titleJa: "サイレントヒル2", score: 8.7 },
+    { titleZh: "马克思佩恩", titleEn: "Max Payne", titleJa: "マックス・ペイン", score: 8.5 },
+    { titleZh: "黄金太阳", titleEn: "Golden Sun", titleJa: "黄金の太陽", score: 8.4 },
+    { titleZh: "文明3", titleEn: "Sid Meier's Civilization III", titleJa: "シヴィライゼーションIII", score: 8.3 },
+    { titleZh: "鬼武者", titleEn: "Onimusha: Warlords", titleJa: "鬼武者", score: 8.2 },
+    { titleZh: "真三国无双2", titleEn: "Dynasty Warriors 2", titleJa: "真・三國無双2", score: 8.1 },
+    { titleZh: "拳皇2001", titleEn: "The King of Fighters 2001", titleJa: "ザ・キング・オブ・ファイターズ2001", score: 7.9 },
+  ],
+  "2002": [
+    { titleZh: "塞尔达传说：风之杖", titleEn: "The Legend of Zelda: The Wind Waker", titleJa: "ゼルダの伝説 風のタクト", score: 8.9 },
+    { titleZh: "王国之心", titleEn: "Kingdom Hearts", titleJa: "キングダム ハーツ", score: 8.4 },
+    { titleZh: "宝可梦 红宝石/蓝宝石", titleEn: "Pokémon Ruby/Sapphire", titleJa: "ポケットモンスター ルビー・サファイア", score: 8.4 },
+    { titleZh: "魔兽争霸3：混乱之治", titleEn: "Warcraft III: Reign of Chaos", titleJa: "ウォークラフトIII", score: 8.7 },
+    { titleZh: "上古卷轴3：晨风", titleEn: "The Elder Scrolls III: Morrowind", titleJa: "エルダースクロールズIII", score: 8.7 },
+    { titleZh: "银河战士Prime", titleEn: "Metroid Prime", titleJa: "メトロイドプライム", score: 9.0 },
+    { titleZh: "超级马里奥阳光", titleEn: "Super Mario Sunshine", titleJa: "スーパーマリオサンシャイン", score: 8.4 },
+    { titleZh: "GTA：罪恶都市", titleEn: "Grand Theft Auto: Vice City", titleJa: "グランド・セフト・オート バイスシティ", score: 8.6 },
+    { titleZh: "生化危机0", titleEn: "Resident Evil 0", titleJa: "バイオハザード0", score: 8.0 },
+    { titleZh: "最终幻想11", titleEn: "Final Fantasy XI", titleJa: "ファイナルファンタジーXI", score: 8.2 },
+    { titleZh: "无冬之夜", titleEn: "Neverwinter Nights", titleJa: "ネヴァーウィンター・ナイツ", score: 8.3 },
+    { titleZh: "银河战士 融合", titleEn: "Metroid Fusion", titleJa: "メトロイドフュージョン", score: 8.6 },
+  ],
+  "2003": [
+    { titleZh: "波斯王子：时之砂", titleEn: "Prince of Persia: The Sands of Time", titleJa: "プリンス・オブ・ペルシャ 時間の砂", score: 8.6 },
+    { titleZh: "最终幻想X-2", titleEn: "Final Fantasy X-2", titleJa: "ファイナルファンタジーX-2", score: 8.1 },
+    { titleZh: "魔兽争霸3：冰封王座", titleEn: "Warcraft III: The Frozen Throne", titleJa: "ウォークラフトIII 氷封王座", score: 8.6 },
+    { titleZh: "马里奥赛车：双重冲击", titleEn: "Mario Kart: Double Dash!!", titleJa: "マリオカート ダブルダッシュ!!", score: 8.4 },
+    { titleZh: "寂静岭3", titleEn: "Silent Hill 3", titleJa: "サイレントヒル3", score: 8.3 },
+    { titleZh: "塞尔达传说：四支剑", titleEn: "The Legend of Zelda: Four Swords", titleJa: "ゼルダの伝説 4つの剣", score: 8.0 },
+    { titleZh: "反恐精英1.6", titleEn: "Counter-Strike 1.6", titleJa: "カウンターストライク1.6", score: 8.2 },
+    { titleZh: "真三国无双3", titleEn: "Dynasty Warriors 3", titleJa: "真・三國無双3", score: 8.1 },
+    { titleZh: "马里奥与路易吉RPG", titleEn: "Mario & Luigi: Superstar Saga", titleJa: "マリオ&ルイージRPG", score: 8.3 },
+    { titleZh: "恶魔城：无罪的叹息", titleEn: "Castlevania: Lament of Innocence", titleJa: "キャッスルヴァニア 無罪の嘆き", score: 8.0 },
+    { titleZh: "生化危机：逃出生天", titleEn: "Resident Evil: Outbreak", titleJa: "バイオハザード アウトブレイク", score: 7.8 },
+    { titleZh: "真女神转生3", titleEn: "Shin Megami Tensei III: Nocturne", titleJa: "真・女神転生III-NOCTURNE", score: 8.5 },
+  ],
+  "2004": [
+    { titleZh: "勇者斗恶龙8", titleEn: "Dragon Quest VIII", titleJa: "ドラゴンクエストVIII", score: 8.8 },
+    { titleZh: "半条命2", titleEn: "Half-Life 2", titleJa: "ハーフライフ2", score: 9.1 },
+    { titleZh: "GTA：圣安地列斯", titleEn: "Grand Theft Auto: San Andreas", titleJa: "グランド・セフト・オート サンアンドレアス", score: 8.9 },
+    { titleZh: "光环2", titleEn: "Halo 2", titleJa: "ヘイロー2", score: 8.7 },
+    { titleZh: "魔兽世界", titleEn: "World of Warcraft", titleJa: "ワールド オブ ウォークラフト", score: 8.9 },
+    { titleZh: "怪物猎人", titleEn: "Monster Hunter", titleJa: "モンスターハンター", score: 8.3 },
+    { titleZh: "合金装备3", titleEn: "Metal Gear Solid 3: Snake Eater", titleJa: "メタルギアソリッド3", score: 9.0 },
+    { titleZh: "忍者龙剑传", titleEn: "Ninja Gaiden", titleJa: "忍者外伝", score: 8.5 },
+    { titleZh: "毁灭战士3", titleEn: "Doom 3", titleJa: "DOOM3", score: 8.1 },
+    { titleZh: "孤岛惊魂", titleEn: "Far Cry", titleJa: "ファークライ", score: 8.2 },
+    { titleZh: "宝可梦 火红/叶绿", titleEn: "Pokémon FireRed/LeafGreen", titleJa: "ポケットモンスター ファイアレッド・リーフグリーン", score: 8.3 },
+    { titleZh: "模拟人生2", titleEn: "The Sims 2", titleJa: "シムズ2", score: 8.2 },
+  ],
+  "2005": [
+    { titleZh: "生化危机4", titleEn: "Resident Evil 4", titleJa: "バイオハザード4", score: 9.1 },
+    { titleZh: "战神", titleEn: "God of War", titleJa: "ゴッド・オブ・ウォー", score: 8.9 },
+    { titleZh: "王国之心2", titleEn: "Kingdom Hearts II", titleJa: "キングダム ハーツII", score: 8.5 },
+    { titleZh: "马里奥赛车DS", titleEn: "Mario Kart DS", titleJa: "マリオカートDS", score: 8.3 },
+    { titleZh: "帝国时代3", titleEn: "Age of Empires III", titleJa: "エイジ オブ エンパイアIII", score: 8.2 },
+    { titleZh: "文明4", titleEn: "Sid Meier's Civilization IV", titleJa: "シヴィライゼーションIV", score: 8.7 },
+    { titleZh: "任天狗", titleEn: "Nintendogs", titleJa: "ニンテンドッグズ", score: 8.1 },
+    { titleZh: "鬼泣3", titleEn: "Devil May Cry 3", titleJa: "デビルメイクライ3", score: 8.3 },
+    { titleZh: "旺达与巨像", titleEn: "Shadow of the Colossus", titleJa: "ワンダと巨像", score: 9.0 },
+    { titleZh: "真三国无双4", titleEn: "Dynasty Warriors 4", titleJa: "真・三國無双4", score: 8.1 },
+    { titleZh: "恶魔城：黑暗诅咒", titleEn: "Castlevania: Curse of Darkness", titleJa: "キャッスルヴァニア 闇の呪印", score: 7.9 },
+    { titleZh: "脑锻炼", titleEn: "Brain Age: Train Your Brain in Minutes a Day!", titleJa: "脳を鍛える大人のDSトレーニング", score: 7.8 },
+  ],
+};
+
+
+const allYears = Object.keys(gameData).sort((a, b) => Number(a) - Number(b));
+const getGameTitle = (item, lang) => lang === "en" ? item.titleEn : lang === "ja" ? item.titleJa : item.titleZh;
+const totalGames = allYears.reduce((n, y) => n + (gameData[y] || []).length, 0);
+
+/* ===================== i18n（三语全文案） ===================== */
+const translations = {
+  zh: {
+    title: "游戏世代 经典版", subtitle: "点击选择你玩过的游戏", website: "game-sedai-classic.egoist.dev",
+    watchedCount: "我玩过 {{count}}/{{total}} 款游戏",
+    selectAll: "全选", clear: "清除", copyImage: "复制图片", downloadImage: "下载图片",
+    copySuccess: "复制成功", downloadSuccess: "下载成功",
+    copyFailed: "复制失败: {{error}}", downloadFailed: "下载失败: {{error}}",
+    copying: "复制中", downloading: "下载中", unknownError: "未知错误",
+    promptType: "锐评提示词", promptNormal: "普通", promptZako: "杂鱼❤",
+    copy: "复制", openInChatGPT: "在 ChatGPT 中打开",
+    footer: "历年关注最多的游戏，由 Marvis 生成。",
+    footerCredit: "基于 anime-sedai 复刻",
+    year: "年", watched: "玩过", notWatched: "没玩过", none: "无",
+    yearRange: "年份范围", last5Years: "近 5 年", last10Years: "近 10 年", last15Years: "近 15 年", allYears: "全部",
+    language: "语言", chinese: "中文", english: "English", japanese: "日本語",
+    recordNote: "用户游戏游玩记录：(下面的年份是游戏发布的年份)"
+  },
+  en: {
+    title: "Game Sedai Classic", subtitle: "Click to select games you have played", website: "game-sedai-classic.egoist.dev",
+    watchedCount: "I have played {{count}}/{{total}} games",
+    selectAll: "Select All", clear: "Clear", copyImage: "Copy Image", downloadImage: "Download Image",
+    copySuccess: "Copy successful", downloadSuccess: "Download successful",
+    copyFailed: "Copy failed: {{error}}", downloadFailed: "Download failed: {{error}}",
+    copying: "Copying", downloading: "Downloading", unknownError: "Unknown error",
+    promptType: "AI Prompt", promptNormal: "Normal", promptZako: "Zako❤",
+    copy: "Copy", openInChatGPT: "Open in ChatGPT",
+    footer: "Most followed games by year, generated by Marvis.",
+    footerCredit: "Remake based on anime-sedai",
+    year: "", watched: "Played", notWatched: "Not Played", none: "None",
+    yearRange: "Years", last5Years: "Last 5 years", last10Years: "Last 10 years", last15Years: "Last 15 years", allYears: "All",
+    language: "Language", chinese: "中文", english: "English", japanese: "日本語",
+    recordNote: "User game playing record: (the year below is the game release year)"
+  },
+  ja: {
+    title: "ゲーム世代 クラシック", subtitle: "遊んだゲームをタップして選択する", website: "game-sedai-classic.egoist.dev",
+    watchedCount: "{{count}}/{{total}} のゲームを遊んだ",
+    selectAll: "すべて選択", clear: "クリア", copyImage: "イメージをコピー", downloadImage: "イメージをダウンロード",
+    copySuccess: "コピー成功", downloadSuccess: "ダウンロード成功",
+    copyFailed: "コピー失敗: {{error}}", downloadFailed: "ダウンロード失敗: {{error}}",
+    copying: "コピー中", downloading: "ダウンロード中", unknownError: "未知のエラー",
+    promptType: "コメントプロンプト", promptNormal: "通常", promptZako: "雑魚❤",
+    copy: "コピー", openInChatGPT: "ChatGPTで開く",
+    footer: "各年フォロー数が一番多いゲーム。Marvis によって生成されました。",
+    footerCredit: "anime-sedai を基にしたリメイク",
+    year: "年", watched: "遊んだ", notWatched: "遊んでいない", none: "なし",
+    yearRange: "年範囲", last5Years: "直近 5 年", last10Years: "直近 10 年", last15Years: "直近 15 年", allYears: "すべて",
+    language: "言語", chinese: "中文", english: "English", japanese: "日本語",
+    recordNote: "ユーザーのゲームプレイ記録：(下の年はゲームの発売年)"
+  }
+};
+
+/* ===================== 锐评提示词模板（三语，普通/杂鱼❤） ===================== */
+const promptTemplates = {
+  zh: {
+    normal: "以下是用户的游戏游玩记录，请生成一个锐评。",
+    zako: `你是一个精通游戏文化的傲娇雌小鬼，需要根据用户提供的游戏游玩记录，用雌小鬼惯用的嘲讽语气混合游戏圈梗生成锐评报告。要求：
+1. 结构模板
+  - 列出5-6个嘲讽段落
+  - 每个段落的所有内容请务必都包含在 ">> 标签" 开始的一行之后！！
+  - 每一个嘲讽段落的主题都应当不同，且应当尖锐
+  - 你应当大量地使用"杂鱼"、"❤"、"杂鱼~"、"杂鱼❤~"，"不会吧不会吧"等雌小鬼常用词汇
+  - 不要在输出的报告中写题目以及任何 markdown 样式，这非常，非常重要！！
+2. 内容规则
+  - 一些常见的梗类型：
+    - 冷门游戏暴露癖（例："玩这种没人讨论的冷门游戏，大哥哥该不会在评论区等'同类'吧？杂鱼❤"）
+    - 游戏时长羞辱（例："通关速度比新兵训练还慢？杂鱼哥哥的攻略速度比读条还慢呢~"）
+    - 类型单一化（例："全是开放世界？大哥哥的想象力比地图还空旷呢~"）
+    - 游戏难度玩梗（例："魂系全通关？杂鱼哥哥该不会真以为自己很硬核吧？"）
+    - 所有内容必须包含在 ">> 标签" 行之后
+  - 想一下还有哪些适合用来嘲讽的梗，但不要太多，否则会显得很杂乱
+3. 示例:
+"""
+>> 全成就收集の杂鱼❤
+
+不会吧不会吧？从2006到2025年才打通这么点游戏？杂鱼哥哥的攻略速度比加载界面还慢呢❤~等你通关，显卡都换代三回了杂鱼~杂鱼❤~
+
+>> 冷门游戏の孤独癖❤
+
+只玩独立小众游戏？看这种没人讨论的游戏，杂鱼哥哥该不会在论坛蹲"同类"吧❤~不会真以为自己是游戏鉴赏家吧？杂鱼❤~
+
+>> 游戏库贫瘠の杂鱼❤
+
+这么点游戏就敢自称玩家？杂鱼哥哥的游戏库比DLC还单薄呢❤~不会吧不会吧，该不会把通关当成就系统刷吧？杂鱼❤~杂鱼~
+
+>> ...
+
+...
+"""
+现在开始分析用户的游戏游玩记录，按上述格式输出锐评报告。`
+  },
+  en: {
+    normal: "The following is the user's game playing record, please generate a sharp review.",
+    zako: `You are a proud and arrogant otaku girl who needs to generate a sharp review report based on the user's game playing record using the sarcastic tone commonly used by tsundere characters mixed with gaming culture memes. Requirements:
+1. Structure template
+  - List 5-6 sarcastic paragraphs
+  - All content in each paragraph must be included after a line starting with ">> tag"!!
+  - Each sarcastic paragraph should have a different theme and should be sharp
+  - You should extensively use terms like "Zako", "❤", "Zako~", "Zako❤~", "No way no way" and other commonly used tsundere vocabulary
+  - Do not write titles or any markdown styles in the output report, this is very, very important!!
+2. Content rules
+  - Some common meme types:
+    - Obscure game exposure fetish (e.g., "Playing such obscure games that no one talks about, big brother wouldn't be waiting for 'fellow fans' in the comments, would you? Zako❤")
+    - Gaming speed shaming (e.g., "Only cleared that many games from 2006 to 2025? Big brother's clear speed is slower than a loading screen~")
+    - Type singularity (e.g., "All open-world? Big brother's imagination is emptier than the map~")
+    - Difficulty memes (e.g., "Cleared every souls-like? Big brother wouldn't really think you're hardcore, would you?")
+    - All content must be included after ">> tag" lines
+  - Think of other suitable memes for sarcasm, but not too many, otherwise it will seem cluttered
+3. Example:
+"""
+>> Completion speed Zako❤
+
+No way no way? Only cleared that many games from 2006 to 2025? Big brother's clear speed is slower than a loading screen❤~ By the time you finish, GPUs will have upgraded three generations, Zako~Zako❤~
+
+>> Obscure game loner fetish❤
+
+Only indie niche games? Playing such obscure games that no one discusses, big brother wouldn't be lurking in forums waiting for "fellow fans", would you❤~ You wouldn't really think you're a game connoisseur, would you? Zako❤~
+
+>> Meager game library Zako❤
+
+That few games and you dare call yourself a gamer? Big brother's library is thinner than a DLC❤~ No way no way, you wouldn't treat clearing games like an achievement system, would you? Zako❤~Zako~
+
+>> ...
+
+...
+"""
+Now start analyzing the user's game playing record and output a sharp review report according to the above format.`
+  },
+  ja: {
+    normal: "以下はユーザーのゲームプレイ履歴です。辛口なレビューを生成してください。",
+    zako: `あなたはゲーム文化に精通したツンデレ系のメスガキです。ユーザーが提供したゲームプレイ履歴に基づいて、メスガキ特有の煽り口調とゲーム界のネタを織り交ぜた辛口レビューを生成してください。要求は以下の通りです：
+1. 構成テンプレート
+  - 煽り段落を5〜6個作成すること
+  - 各段落のすべての内容は必ず「>> タグ」ではじまる1行のあとに含めてください！！
+  - 各段落は異なるテーマで、かつ鋭く突き刺すような内容にしてください
+  - 「雑魚」「❤」「雑魚~」「雑魚❤~」「まさかまさか～？」など、メスガキがよく使う表現をたっぷり使ってください
+  - 出力するレビューにはタイトルやマークダウン記法を絶対に含めないでください！！
+2. 内容ルール
+  - よくある煽りネタのタイプ例：
+    - マイナーゲーム偏愛（例：「こんな誰も知らないマイナーゲーム遊んでるなんて、お兄ちゃんもしかして掲示板で“同類”探してるの？雑魚❤」）
+    - クリア速度の遅さをバカにする（例：「2006年から2025年まででたったそれだけ？雑魚お兄ちゃんのクリア速度、ロード画面より遅いんだけど~❤」）
+    - ジャンル偏り（例：「オープンワールドばっかじゃん？お兄ちゃんの想像力、マップより空っぽなんだけど~❤」）
+    - 難易度ネタ（例：「ソウル系全クリ？お兄ちゃんもしかして自分が硬派だと思ってるの？雑魚❤」）
+    - すべての段落の内容は**「>> タグ」行のあとに含めてください！！**
+  - 他にも煽りに使えるネタを考えてよいですが、数が多すぎないようにしてください。ゴチャゴチャになるのはNGです。
+3. 例文（サンプル）：
+"""
+>> クリア速度カメの雑魚❤
+
+まさかまさか～？2006年から2025年まででたったそれだけしかクリアしてないの？雑魚お兄ちゃんのクリア速度、ロード画面より遅いんだけど❤~ クリアし終わる頃にはグラボ3世代進化してるよ雑魚~雑魚❤~
+
+>> マイナーゲーム愛好の孤独癖❤
+
+インディーのマイナーゲームばっか？そんな誰も語ってないゲーム遊んでるなんて、雑魚お兄ちゃんフォーラムで“同類”探してるんじゃないの❤~ ゲーム鑑賞家でも気取ってるつもり？雑魚❤~
+
+>> ゲームライブラリスカスカの雑魚❤
+
+たったそれだけでゲーマー名乗ってんの？雑魚お兄ちゃんのライブラリ、DLCより薄いんだけど❤~ まさかまさか、クリアを実績解除だと思ってるの？雑魚❤~雑魚~
+
+>> ...
+
+...
+"""
+今からユーザーのゲームプレイ履歴を分析し、上記のフォーマットに従って辛口レビューを出力してください。`
+  }
+};
+
+/* ===================== 状态（localStorage 持久化） ===================== */
+const store = {
+  get(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === null) return fallback;
+      return JSON.parse(raw);
+    } catch (e) { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+};
+
+let language = store.get("gameSedaiLanguage", "zh");
+let yearRange = store.get("gameSedaiYearRange", "all");
+let selectedGames = store.get("gameSedaiSelected", []);
+let promptType = "zako";
+
+const $ = (id) => document.getElementById(id);
+
+/* ===================== 渲染 ===================== */
+const getVisibleYears = () => {
+  if (yearRange === "all") return allYears;
+  return allYears.slice(-Number(yearRange));
+};
+
+const getVisibleGameKeys = () => {
+  return getVisibleYears().flatMap((year) => (gameData[year] || []).slice(0, 12).map((item) => getGameTitle(item, "zh")));
+};
+
+const visibleKeySet = () => new Set(getVisibleGameKeys());
+
+function renderLangToggle() {
+  const langs = [
+    { code: "zh", label: "中文" },
+    { code: "en", label: "English" },
+    { code: "ja", label: "日本語" }
+  ];
+  $("langToggle").innerHTML = langs.map((l) =>
+    '<button data-lang="' + l.code + '" class="' + (language === l.code ? "active" : "") + '">' + l.label + "</button>"
+  ).join("");
+}
+
+function t(key, vars) {
+  let str = (translations[language] && translations[language][key]) || translations.zh[key] || key;
+  if (vars) {
+    Object.keys(vars).forEach((k) => { str = str.replace("{{" + k + "}}", vars[k]); });
+  }
+  return str;
+}
+
+function renderStaticText() {
+  document.title = t("title");
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  $("titleText").textContent = t("title");
+  $("subtitleText").textContent = " - " + t("subtitle");
+  $("siteText").textContent = t("website");
+  $("selectAllBtn").textContent = t("selectAll");
+  $("clearBtn").textContent = t("clear");
+  $("copyImageBtn").textContent = t("copyImage");
+  $("downloadImageBtn").textContent = t("downloadImage");
+  $("copyPromptBtn").textContent = t("copy");
+  $("chatgptBtn").textContent = t("openInChatGPT");
+  $("footerText").innerHTML = t("footer") + ' <a href="https://github.com/egoist/anime-sedai" target="_blank">' + t("footerCredit") + "</a>";
+  renderLangToggle();
+}
+
+function renderTable() {
+  const years = getVisibleYears();
+  const keys = getVisibleGameKeys();
+  const total = keys.length;
+  const selectedVisible = selectedGames.filter((title) => keys.includes(title)).length;
+  $("countText").textContent = t("watchedCount", { count: selectedVisible, total });
+
+  const body = $("tableBody");
+  let html = "";
+  years.forEach((year) => {
+    const items = (gameData[year] || []).slice(0, 12);
+    html += '<div class="year-row">';
+    html += '<div class="year-col"><span>' + year + "</span></div>";
+    html += '<div class="cell-row">';
+    items.forEach((item) => {
+      const key = getGameTitle(item, "zh");
+      const displayTitle = getGameTitle(item, language);
+      const isSelected = selectedGames.includes(key);
+      const cls = ["game-btn", language === "en" ? "en" : language === "ja" ? "ja" : ""].join(" ").trim();
+      html += '<button class="' + cls + (isSelected ? " selected" : "") + '" data-key="' + key + '" title="' + displayTitle.replace(/"/g, "&quot;") + '"><span>' + displayTitle + "</span></button>";
+    });
+    for (let i = items.length; i < 12; i++) {
+      html += '<div class="empty-cell ' + (language === "en" ? "en" : language === "ja" ? "ja" : "") + '"></div>';
+    }
+    html += '<div class="row-end"></div>';
+    html += "</div></div>";
+  });
+  body.innerHTML = html;
+  $("clearBtn").style.display = selectedVisible > 0 ? "inline-flex" : "none";
+}
+
+function renderPrompt() {
+  const templates = promptTemplates[language] || promptTemplates.zh;
+  const preset = promptType === "normal" ? templates.normal : templates.zako;
+  const years = getVisibleYears();
+  const lines = [preset, t("recordNote")];
+  years.forEach((year) => {
+    const items = (gameData[year] || []).slice(0, 12);
+    if (items.length === 0) return;
+    const watched = items.filter((item) => selectedGames.includes(getGameTitle(item, "zh"))).map((item) => getGameTitle(item, language)).join(", ");
+    const unWatched = items.filter((item) => !selectedGames.includes(getGameTitle(item, "zh"))).map((item) => getGameTitle(item, language)).join(", ");
+    lines.push("**" + year + t("year") + "**:", t("watched") + ": " + (watched || t("none")), t("notWatched") + ": " + (unWatched || t("none")));
+  });
+  $("promptText").value = lines.filter(Boolean).join("\n");
+}
+
+function renderAll() {
+  renderStaticText();
+  renderTable();
+  renderPrompt();
+}
+
+/* ===================== 表格截图（内嵌 dom→svg-foreignObject→canvas） ===================== */
+function tableToBlob(scale) {
+  return new Promise((resolve, reject) => {
+    try {
+      const card = $("tableCard");
+      // 克隆并内联 computed style，保证截图样式与页面一致
+      const clone = card.cloneNode(true);
+      const srcNodes = card.querySelectorAll("*");
+      const dstNodes = clone.querySelectorAll("*");
+      for (let i = 0; i < srcNodes.length; i++) {
+        const cs = window.getComputedStyle(srcNodes[i]);
+        const dst = dstNodes[i];
+        let inline = "";
+        for (let j = 0; j < cs.length; j++) {
+          const prop = cs[j];
+          inline += prop + ":" + cs.getPropertyValue(prop) + ";";
+        }
+        dst.setAttribute("style", inline);
+        dst.removeAttribute("class");
+        dst.removeAttribute("data-key");
+      }
+      // 移除截图排除项（副标题）
+      clone.querySelectorAll(".remove").forEach((el) => el.remove());
+      const rect = card.getBoundingClientRect();
+      const w = Math.max(1, Math.ceil(rect.width));
+      const h = Math.max(1, Math.ceil(rect.height));
+      const xml = new XMLSerializer().serializeToString(clone);
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"><foreignObject width="100%" height="100%">' + xml + "</foreignObject></svg>";
+      const img = new Image();
+      const canvas = document.createElement("canvas");
+      canvas.width = w * scale;
+      canvas.height = h * scale;
+      img.onload = () => {
+        const ctx = canvas.getContext("2d");
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))), "image/png");
+      };
+      img.onerror = () => reject(new Error("SVG render failed"));
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+async function copyImage() {
+  try {
+    const blob = await tableToBlob(2);
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+    alert(t("copySuccess"));
+  } catch (e) {
+    alert(t("copyFailed", { error: e.message || t("unknownError") }));
+  }
+}
+
+async function downloadImage() {
+  try {
+    const blob = await tableToBlob(2);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "game-sedai.png";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  } catch (e) {
+    alert(t("downloadFailed", { error: e.message || t("unknownError") }));
+  }
+}
+
+/* ===================== 事件绑定 ===================== */
+$("yearRangeSelect").addEventListener("change", (e) => {
+  yearRange = e.currentTarget.value;
+  store.set("gameSedaiYearRange", yearRange);
+  renderAll();
+});
+
+$("langToggle").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-lang]");
+  if (!btn) return;
+  language = btn.getAttribute("data-lang");
+  store.set("gameSedaiLanguage", language);
+  renderAll();
+});
+
+$("tableBody").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-key]");
+  if (!btn) return;
+  const key = btn.getAttribute("data-key");
+  if (selectedGames.includes(key)) {
+    selectedGames = selectedGames.filter((title) => title !== key);
+  } else {
+    selectedGames = [...selectedGames, key];
+  }
+  store.set("gameSedaiSelected", selectedGames);
+  renderTable();
+  renderPrompt();
+});
+
+$("selectAllBtn").addEventListener("click", () => {
+  const hidden = selectedGames.filter((title) => !visibleKeySet().has(title));
+  selectedGames = [...hidden, ...getVisibleGameKeys()];
+  store.set("gameSedaiSelected", selectedGames);
+  renderTable();
+  renderPrompt();
+});
+
+$("clearBtn").addEventListener("click", () => {
+  const visible = visibleKeySet();
+  selectedGames = selectedGames.filter((title) => !visible.has(title));
+  store.set("gameSedaiSelected", selectedGames);
+  renderTable();
+  renderPrompt();
+});
+
+$("copyImageBtn").addEventListener("click", copyImage);
+$("downloadImageBtn").addEventListener("click", downloadImage);
+
+$("promptTypeSelect").addEventListener("change", (e) => {
+  promptType = e.currentTarget.value;
+  renderPrompt();
+});
+
+$("copyPromptBtn").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("promptText").value);
+    alert(t("copySuccess"));
+  } catch (e) {
+    alert(t("copyFailed", { error: e.message || t("unknownError") }));
+  }
+});
+
+$("chatgptBtn").addEventListener("click", () => {
+  window.open("https://chatgpt.com/?q=" + encodeURIComponent($("promptText").value), "_blank");
+});
+
+/* ===================== 初始化 ===================== */
+$("yearRangeSelect").value = yearRange;
+$("promptTypeSelect").value = promptType;
+renderAll();
+</script>
+</body>
+</html>
