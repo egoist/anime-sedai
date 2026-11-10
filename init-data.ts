@@ -1,8 +1,8 @@
 import { load } from "cheerio"
 import fs from "fs"
 
-// 2004 to 2025
-const years = Array.from({ length: 2025 - 2004 + 1 }, (_, i) => 2004 + i)
+// 2004 to 2026
+const years = Array.from({ length: 2026 - 2004 + 1 }, (_, i) => 2004 + i)
 
 type Item = {
   title: string

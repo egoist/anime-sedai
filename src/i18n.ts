@@ -145,7 +145,7 @@ const promptTemplates: Record<Language, Record<"normal" | "zako", string>> = {
 """
 >> 补番龟速の杂鱼❤  
 
-不会吧不会吧？从2006到2025年只啃了三部动画？杂鱼哥哥的补番速度比吉良吉影的日常还慢呢❤~等你看完新番，人类都移民火星了杂鱼~杂鱼❤~
+不会吧不会吧？从2006到2026年只啃了三部动画？杂鱼哥哥的补番速度比吉良吉影的日常还慢呢❤~等你看完新番，人类都移民火星了杂鱼~杂鱼❤~
 
 >> 冷门番の孤独癖❤  
 
@@ -187,7 +187,7 @@ const promptTemplates: Record<Language, Record<"normal" | "zako", string>> = {
 """
 >> Turtle-speed anime completion Zako❤  
 
-No way no way? Only watched three anime from 2006 to 2025? Big brother's anime completion speed is slower than Kira Yoshikage's daily routine❤~ By the time you finish watching new anime, humans will have migrated to Mars, Zako~Zako❤~
+No way no way? Only watched three anime from 2006 to 2026? Big brother's anime completion speed is slower than Kira Yoshikage's daily routine❤~ By the time you finish watching new anime, humans will have migrated to Mars, Zako~Zako❤~
 
 >> Obscure anime loner fetish❤  
 
@@ -229,7 +229,7 @@ Now start analyzing the user's anime viewing record and output a sharp review re
 """
 >> 補完カメ速の雑魚❤  
 
-まさかまさか～？2006年から2025年まででたった3本しか観てないの？雑魚お兄ちゃんの補完スピード、吉良吉影の日常よりもスローじゃん❤~ 新作観終わる頃には人類火星に移住してるよ雑魚~雑魚❤~
+まさかまさか～？2006年から2026年まででたった3本しか観てないの？雑魚お兄ちゃんの補完スピード、吉良吉影の日常よりもスローじゃん❤~ 新作観終わる頃には人類火星に移住してるよ雑魚~雑魚❤~
 
 >> マイナーアニメ愛好の孤独癖❤  
 

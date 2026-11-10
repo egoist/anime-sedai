@@ -1953,6 +1953,80 @@ const data: Data = {
       score: 6.2,
     },
   ],
+  "2026": [
+    {
+      titleZh: "尼古喵喵",
+      titleEn: "Yani Neko",
+      titleJa: "ヤニねこ",
+      score: 7.5,
+    },
+    {
+      titleZh: "相反的你和我",
+      titleEn: "You and I Are Polar Opposites",
+      titleJa: "正反対な君と僕",
+      score: 7.7,
+    },
+    {
+      titleZh: "上伊那牡丹，酒醉身姿似百合花般",
+      titleEn: "Kamiina Botan, Yoeru Sugata wa Yuri no Hana",
+      titleJa: "上伊那ぼたん、酔へる姿は百合の花",
+      score: 7.1,
+    },
+    {
+      titleZh: "学生会也有洞！",
+      titleEn: "Even the Student Council Has Its Holes!",
+      titleJa: "生徒会にも穴はある！",
+      score: 7.7,
+    },
+    {
+      titleZh: "在超市后门吸烟的二人",
+      titleEn: "Smoking Behind the Supermarket with You",
+      titleJa: "スーパーの裏でヤニ吸うふたり",
+      score: 6.8,
+    },
+    {
+      titleZh: "异国日记",
+      titleEn: "Journal with Witch",
+      titleJa: "違国日記",
+      score: 8.4,
+    },
+    {
+      titleZh: "FX战士久留美",
+      titleEn: "FX Fighter Kurumi-chan",
+      titleJa: "FX戦士くるみちゃん",
+      score: 6.8,
+    },
+    {
+      titleZh: "穹庐下的魔女",
+      titleEn: "Jaadugar: A Witch in Mongolia",
+      titleJa: "天幕のジャードゥーガル",
+      score: 7.9,
+    },
+    {
+      titleZh: "与你相恋到生命尽头",
+      titleEn: "I Want to Love You Till Your Dying Day",
+      titleJa: "きみが死ぬまで恋をしたい",
+      score: 6.6,
+    },
+    {
+      titleZh: "判处勇者刑 惩罚勇者9004队刑务纪录",
+      titleEn: "Sentenced to Be a Hero",
+      titleJa: "勇者刑に処す 懲罰勇者9004隊刑務記録",
+      score: 6.7,
+    },
+    {
+      titleZh: "尖帽子的魔法工房",
+      titleEn: "Atelier of Witch Hat",
+      titleJa: "とんがり帽子のアトリエ",
+      score: 6.2,
+    },
+    {
+      titleZh: "再见菈菈",
+      titleEn: "Goodbye, Lara",
+      titleJa: "さよならララ",
+      score: 6.4,
+    },
+  ],
 }
 
 // 添加一个辅助函数来根据语言获取动画标题
