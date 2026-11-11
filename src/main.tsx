@@ -16,8 +16,7 @@ ReactDOM.createRoot(document.getElementById("app")!).render(
 if (import.meta.env.PROD) {
   const script = document.createElement("script")
   script.defer = true
-  script.async = true
-  script.src = "https://u.egoist.dev/script.js"
-  script.dataset.websiteId = "50ec8a62-f258-455c-892f-0f1fedf28cce"
+  script.src = "https://tt.egoist.dev/js/script.js"
+  script.dataset.domain = "anime-sedai.egoist.dev"
   document.body.appendChild(script)
 }
