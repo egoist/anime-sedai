@@ -1,11 +1,10 @@
-import { useMemo, useRef, useState, useEffect } from "react"
+import { useMemo, useRef, useEffect } from "react"
 import animeData, { getAnimeTitle } from "../anime-data"
 import { domToBlob } from "modern-screenshot"
 import { toast } from "sonner"
 import { usePersistState } from "./hooks"
 import { useI18n } from "./i18n-context"
 import { LanguageToggle } from "./LanguageToggle"
-import { getPromptTemplate } from "./i18n"
 
 type YearRange = "5" | "10" | "15" | "all"
 
@@ -109,47 +108,6 @@ export const App = () => {
 
     URL.revokeObjectURL(url)
   }
-
-  const [promptType, setPromptType] = useState<"normal" | "zako">("zako")
-  const prompt = useMemo(() => {
-    const templates = getPromptTemplate(language)
-    const preset = promptType === "normal" ? templates.normal : templates.zako
-
-    return `
-${preset}
-${
-  t("watched") === "Watched"
-    ? "User anime viewing record: (the year below is the anime release year)"
-    : "用户动画观看记录：(下面的年份是动画发布的年份)"
-}
-${visibleYears
-  .map((year) => {
-    const items = animeData[year] || []
-
-    if (items.length === 0) return ""
-
-    const sliceItems = items.slice(0, 12)
-    const watched = sliceItems
-      .filter((item) => selectedAnime.includes(getAnimeTitle(item, "zh")))
-      .map((item) => getAnimeTitle(item, language))
-      .join(", ")
-    const unWatched = sliceItems
-      .filter((item) => !selectedAnime.includes(getAnimeTitle(item, "zh")))
-      .map((item) => getAnimeTitle(item, language))
-      .join(", ")
-
-    return [
-      `**${year}${t("year")}**:`,
-      `${t("watched")}: ${watched || t("none")}`,
-      `${t("notWatched")}: ${unWatched || t("none")}`,
-    ]
-      .filter(Boolean)
-      .join("\n")
-  })
-  .filter(Boolean)
-  .join("\n")}
-    `.trim()
-  }, [selectedAnime, promptType, language, t, visibleYears])
 
   const totalAnime = visibleAnimeKeys.length
 
@@ -366,57 +324,6 @@ ${visibleYears
           </button>
         </div>
 
-        <div className="flex flex-col gap-2 max-w-screen-md w-full mx-auto">
-          <div className="border focus-within:ring-2 ring-pink-500 focus-within:border-pink-500 rounded-md">
-            <div className="flex items-center justify-between p-2 border-b">
-              <div className="flex items-center gap-2">
-                <span>{t("promptType")}</span>
-                <select
-                  className="border rounded-md"
-                  value={promptType}
-                  onChange={(e) => {
-                    setPromptType(e.currentTarget.value as any)
-                  }}
-                >
-                  <option value="normal">{t("promptNormal")}</option>
-                  <option value="zako">{t("promptZako")}</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  className="text-sm text-zinc-500 hover:bg-zinc-100 px-1.5 h-7 flex items-center rounded-md"
-                  onClick={() => {
-                    navigator.clipboard.writeText(prompt)
-                    toast.success(t("copySuccess"))
-                  }}
-                >
-                  {t("copy")}
-                </button>
-
-                <button
-                  type="button"
-                  className="text-sm text-zinc-500 hover:bg-zinc-100 px-1.5 h-7 flex items-center rounded-md"
-                  onClick={() => {
-                    location.href = `chatwise://chat?input=${encodeURIComponent(
-                      prompt
-                    )}`
-                  }}
-                >
-                  {t("openInChatWise")}
-                </button>
-              </div>
-            </div>
-            <textarea
-              readOnly
-              className="outline-none w-full p-2 resize-none cursor-default"
-              rows={10}
-              value={prompt}
-            />
-          </div>
-        </div>
-
         <div className="mt-2 text-center">
           {t("footer")}
           <a
@@ -455,15 +362,28 @@ ${visibleYears
 
         <div className="text-center">
           {t("otherProducts")}
-          <a
-            href="https://chatwise.app"
-            target="_blank"
-            className="underline inline-flex items-center gap-1"
-          >
-            <img src="https://chatwise.app/favicon.png" className="size-4" />{" "}
-            ChatWise
-          </a>
-          {t("aiChatClient")}
+          <div>
+            <a
+              href="https://downbit.app"
+              target="_blank"
+              className="underline inline-flex items-center gap-1"
+            >
+              <img src="https://downbit.app/favicon.png" className="size-4" />{" "}
+              Downbit
+            </a>
+            {t("downbitDesc")}
+          </div>
+          <div>
+            <a
+              href="https://screenflare.app"
+              target="_blank"
+              className="underline inline-flex items-center gap-1"
+            >
+              <img src="https://screenflare.app/app-icon.png" className="size-4" />{" "}
+              Screenflare
+            </a>
+            {t("screenflareDesc")}
+          </div>
         </div>
       </div>
     </>
